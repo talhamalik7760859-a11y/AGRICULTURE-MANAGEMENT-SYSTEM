@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agriculture Management System</title>
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --light-green: #e9f7ef;
+            --text-dark: #2c3e50;
+            --bg-color: #f4f6f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body { background-color: var(--bg-color); color: var(--text-dark); }
+
+        header {
+            background-color: var(--dark-green);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: var(--light-green);
+            border: 1px solid var(--primary-green);
+            color: var(--dark-green);
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: left;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        h2 { color: var(--dark-green); margin-bottom: 20px; border-bottom: 2px solid var(--light-green); padding-bottom: 10px; }
+
+        /* Forms */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary-green); }
+
+        .submit-btn {
+            background: var(--primary-green);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .submit-btn:hover { background: var(--dark-green); }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background-color: var(--light-green); color: var(--dark-green); }
+        tr:hover { background-color: #f9f9f9; }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #f1c40f;
+            color: #fff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌿 Agriculture Management System</h1>
+        <p>Empowering Farmers, Connecting Supply Chains</p>
+    </header>
+
+    <div class="container">
+        <!-- Navigation -->
+        <div class="sidebar">
+            <button class="nav-btn active" onclick="showSection('farmers')">🚜 Manage Farmers</button>
+            <button class="nav-btn" onclick="showSection('crops')">🌾 Manage Crops</button>
+            <button class="nav-btn" onclick="showSection('orders')">📦 Orders Queue</button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="main-content">
+            
+            <!-- Farmers Section -->
+            <div id="farmers" class="section active">
+                <h2>Add New Farmer</h2>
+                <form id="farmerForm" onsubmit="addFarmer(event)">
+                    <div class="form-group">
+                        <label>Farmer Name</label>
+                        <input type="text" id="f_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Village</label>
+                        <input type="text" id="f_village" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Number</label>
+                        <input type="text" id="f_contact" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Farmer</button>
+                </form>
+
+                <h2 style="margin-top: 40px;">Registered Farmers</h2>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Name</th><th>Village</th><th>Contact</th></tr>
+                    </thead>
+                    <tbody id="farmerTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Crops Section -->
+            <div id="crops" class="section">
+                <h2>Add New Crop</h2>
+                <form id="cropForm" onsubmit="addCrop(event)">
+                    <div class="form-group">
+                        <label>Crop Name</label>
+                        <input type="text" id="c_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Farmer ID</label>
+                        <input type="number" id="c_farmerId" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity (kg)</label>
+                        <input type="number" step="0.01" id="c_qty" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price per Kg (Rs)</label>
+                        <input type="number" step="0.01" id="c_price" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Crop</button>
+                </form>
+
+                <h2 style="margin-top: 40px;">Available Crops</h2>
+                <table>
+                    <thead>
+                        <tr><th>ID</th><th>Crop</th><th>Farmer ID</th><th>Qty (kg)</th><th>Price/kg</th></tr>
+                    </thead>
+                    <tbody id="cropTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Orders Section -->
+            <div id="orders" class="section">
+                <h2>Place Order</h2>
+                <form id="orderForm" onsubmit="placeOrder(event)">
+                    <div class="form-group">
+                        <label>Crop ID</label>
+                        <input type="number" id="o_cropId" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Buyer Name</label>
+                        <input type="text" id="o_buyer" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity Required (kg)</label>
+                        <input type="number" step="0.01" id="o_qty" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Place Order</button>
+                </form>
+
+                <h2 style="margin-top: 40px;">Order Queue</h2>
+                <button class="submit-btn" style="background:#e67e22; margin-bottom:15px;" onclick="processOrder()">Process Next Order (Queue)</button>
+                <table>
+                    <thead>
+                        <tr><th>Order ID</th><th>Crop ID</th><th>Buyer</th><th>Qty</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="orderTableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Data Structures (Stored in LocalStorage for persistence)
+        let farmers = JSON.parse(localStorage.getItem('farmers')) || [];
+        let crops = JSON.parse(localStorage.getItem('crops')) || [];
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        let nextFarmerId = farmers.length > 0 ? Math.max(...farmers.map(f => f.id)) + 1 : 1;
+        let nextCropId = crops.length > 0 ? Math.max(...crops.map(c => c.id)) + 1 : 1;
+        let nextOrderId = orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1;
+
+        // UI Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function saveData() {
+            localStorage.setItem('farmers', JSON.stringify(farmers));
+            localStorage.setItem('crops', JSON.stringify(crops));
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        // Farmer Logic
+        function addFarmer(e) {
+            e.preventDefault();
+            const farmer = {
+                id: nextFarmerId++,
+                name: document.getElementById('f_name').value,
+                village: document.getElementById('f_village').value,
+                contact: document.getElementById('f_contact').value
+            };
+            farmers.push(farmer);
+            saveData();
+            document.getElementById('farmerForm').reset();
+            renderTables();
+            alert("Farmer added successfully!");
+        }
+
+        // Crop Logic
+        function addCrop(e) {
+            e.preventDefault();
+            const crop = {
+                id: nextCropId++,
+                name: document.getElementById('c_name').value,
+                farmerId: parseInt(document.getElementById('c_farmerId').value),
+                qty: parseFloat(document.getElementById('c_qty').value),
+                price: parseFloat(document.getElementById('c_price').value)
+            };
+            
+            if(!farmers.find(f => f.id === crop.farmerId)) {
+                alert("Error: Farmer ID not found!");
+                return;
+            }
+            
+            crops.push(crop);
+            saveData();
+            document.getElementById('cropForm').reset();
+            renderTables();
+            alert("Crop added successfully!");
+        }
+
+        // Order Logic (Queue behavior)
+        function placeOrder(e) {
+            e.preventDefault();
+            const order = {
+                id: nextOrderId++,
+                cropId: parseInt(document.getElementById('o_cropId').value),
+                buyer: document.getElementById('o_buyer').value,
+                qty: parseFloat(document.getElementById('o_qty').value),
+                status: 'Pending'
+            };
+
+            if(!crops.find(c => c.id === order.cropId)) {
+                alert("Error: Crop ID not found!");
+                return;
+            }
+
+            orders.push(order); // Enqueue
+            saveData();
+            document.getElementById('orderForm').reset();
+            renderTables();
+            alert("Order placed successfully!");
+        }
+
+        function processOrder() {
+            const pendingOrder = orders.find(o => o.status === 'Pending');
+            if(pendingOrder) {
+                pendingOrder.status = 'Processed';
+                saveData();
+                renderTables();
+                alert(`Order ID ${pendingOrder.id} has been processed!`);
+            } else {
+                alert("No pending orders in the queue.");
+            }
+        }
+
+        // Render Data to Tables
+        function renderTables() {
+            document.getElementById('farmerTableBody').innerHTML = farmers.map(f => 
+                `<tr><td>${f.id}</td><td>${f.name}</td><td>${f.village}</td><td>${f.contact}</td></tr>`
+            ).join('');
+
+            document.getElementById('cropTableBody').innerHTML = crops.map(c => 
+                `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.farmerId}</td><td>${c.qty}</td><td>Rs. ${c.price}</td></tr>`
+            ).join('');
+
+            document.getElementById('orderTableBody').innerHTML = orders.map(o => 
+                `<tr>
+                    <td>${o.id}</td><td>${o.cropId}</td><td>${o.buyer}</td><td>${o.qty}</td>
+                    <td><span class="status-badge" style="background: ${o.status === 'Processed' ? '#2ecc71' : '#f1c40f'}">${o.status}</span></td>
+                </tr>`
+            ).join('');
+        }
+
+        // Initial render
+        renderTables();
+    </script>
+</body>
+</html>
